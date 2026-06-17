@@ -6,10 +6,12 @@ import NisnGenerator from './pages/NisnGenerator';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Disclaimer from './pages/Disclaimer';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
