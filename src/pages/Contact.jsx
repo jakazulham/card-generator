@@ -5,7 +5,7 @@ export default function Contact() {
     <div className="page-container" style={{ padding: '4rem 2rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
       <div className="contact-header" style={{ textAlign: 'center', marginBottom: '4rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem' }}>
+        <h1 className="responsive-page-title">
           Hubungi Kami
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto', lineHeight: '1.6' }}>
@@ -13,7 +13,7 @@ export default function Contact() {
         </p>
       </div>
       
-      <div className="glass-card" style={{ 
+      <div className="glass-card contact-glass-card" style={{ 
         maxWidth: '800px', 
         width: '100%', 
         backgroundColor: 'var(--bg-secondary)',
@@ -30,7 +30,7 @@ export default function Contact() {
         overflow: 'hidden'
       }}>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+        <div className="contact-inner-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
           
           {/* WhatsApp Card */}
           <div style={{ 

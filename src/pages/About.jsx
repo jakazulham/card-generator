@@ -5,7 +5,7 @@ export default function About() {
     <div className="page-container" style={{ padding: '2rem 2rem 4rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
       <div className="about-header" style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem' }}>
+        <h1 className="responsive-page-title">
           Tentang Kami
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>
@@ -148,6 +148,12 @@ export default function About() {
               <div className="feature-icon" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🖨️</div>
               <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.75rem', fontSize: '1.1rem' }}>Resolusi Cetak</h3>
               <p style={{ fontSize: '0.95rem', margin: 0 }}>Mendukung pengunduhan berkas resolusi tinggi yang siap dicetak pada media kartu PVC sungguhan.</p>
+            </div>
+            
+            <div className="feature-item" style={{ padding: '1.5rem', background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+              <div className="feature-icon" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>💸</div>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.75rem', fontSize: '1.1rem' }}>100% Gratis</h3>
+              <p style={{ fontSize: '0.95rem', margin: 0 }}>Semua layanan kami dapat digunakan secara cuma-cuma tanpa batasan. Jika Anda merasa web ini bermanfaat, cukup donasikan seikhlasnya untuk membantu kami terus berkembang.</p>
             </div>
           </div>
 

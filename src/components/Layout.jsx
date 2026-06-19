@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Layout() {
@@ -6,6 +6,13 @@ export default function Layout() {
   const navigate = useNavigate();
   const currentPath = location.pathname;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
     <div className="layout-wrapper" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
@@ -19,13 +26,15 @@ export default function Layout() {
             </div>
           </Link>
           
-          <button 
-            className="hamburger-btn" 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            ☰
-          </button>
+          <div className="header-actions">
+            <button 
+              className="hamburger-btn" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+          </div>
 
           <nav className={`main-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             <Link to="/" className={currentPath === '/' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Beranda</Link>
@@ -38,9 +47,18 @@ export default function Layout() {
             </div>
 
             <Link to="/about" className={currentPath === '/about' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Tentang Kami</Link>
-            <a href="/blog/" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
+            <a href="https://blog.cetakkartu.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
             <Link to="/contact" className={currentPath === '/contact' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Kontak</Link>
             <Link to="/disclaimer" className={currentPath === '/disclaimer' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
+            
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              title={theme === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'}
+            >
+              {theme === 'light' ? '🌜' : '🌞'}
+            </button>
           </nav>
         </div>
       </header>
@@ -52,11 +70,9 @@ export default function Layout() {
       <footer className="saas-footer">
         <div className="footer-container">
           <div className="footer-brand">
-            <div className="logo-container">
-              <div className="logo-icon" style={{ fontSize: '1.5rem' }}>🪪</div>
-              <div className="logo-text">
-                <h2 style={{ fontSize: '1.2rem', margin: 0, color: 'var(--text-primary)' }}>CetakKartu.com</h2>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>🪪</span>
+              <h2 style={{ fontSize: '1.2rem', margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CetakKartu.com</h2>
             </div>
             <p className="footer-desc">
               Platform modern untuk membuat dan mencetak berbagai kartu identitas digital secara cepat, gratis, dan profesional tanpa perlu keahlian desain.

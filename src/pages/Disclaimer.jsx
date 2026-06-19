@@ -5,7 +5,7 @@ export default function Disclaimer() {
     <div className="page-container" style={{ padding: '2rem 2rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
       <div className="disclaimer-header" style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem' }}>
+        <h1 className="responsive-page-title">
           Disclaimer & Ketentuan Layanan
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>

@@ -74,25 +74,26 @@ export default function Home() {
           </div>
         </div>
         
-        {/* CSS Mockup Representation instead of heavy images */}
-        <div className="hero-visual">
-          <div className="floating-card card-front">
-            <div className="mock-card-header">
-              <div className="mock-logo"></div>
-              <div className="mock-title">KARTU IDENTITAS</div>
-            </div>
-            <div className="mock-card-body">
-              <div className="mock-photo"></div>
-              <div className="mock-lines">
-                <div className="mock-line w-full"></div>
-                <div className="mock-line w-3/4"></div>
-                <div className="mock-line w-1/2"></div>
+        {/* Card Mockup — clean stacked design with float animation */}
+        <div className="hero-visual-v2">
+          <div className="hero-card-stack">
+            {/* Shadow card behind */}
+            <div className="hero-card hero-card-shadow"></div>
+            {/* Main front card */}
+            <div className="hero-card hero-card-main">
+              <div className="mock-card-header">
+                <div className="mock-logo"></div>
+                <div className="mock-title">KARTU IDENTITAS</div>
+              </div>
+              <div className="mock-card-body">
+                <div className="mock-photo"></div>
+                <div className="mock-lines">
+                  <div className="mock-line w-full"></div>
+                  <div className="mock-line w-3/4"></div>
+                  <div className="mock-line w-1/2"></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="floating-card card-back">
-            <div className="mock-qr"></div>
-            <div className="mock-barcode"></div>
           </div>
         </div>
       </section>

@@ -1,10 +1,33 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import CardPreview, { CardFront, CardBack } from '../components/CardPreview';
 import ErrorNotification from '../components/ErrorNotification';
 
-// Format date to local ID format (DD MMMM YYYY)
+// =============================================================================
+// Konstanta Template — PRD Bagian 5.1: Aset Gambar & Template Kartu
+// Template latar belakang kartu dari folder /assets/ (front & back, 3 model)
+// =============================================================================
+const ASSETS = {
+  front: (id) => `/assets/template_front_${id}.png`,
+  back: (id) => `/assets/template_back_${id}.png`,
+};
+
+const TEMPLATE_COUNT = 3;
+
+// =============================================================================
+// PRD Bagian 5.3: Ukuran Kartu Standar ISO 7810 ID-1 (85.6 mm × 53.98 mm)
+// Tinggi halaman PDF 60 mm untuk memberi ruang teks footer di bawah kartu
+// =============================================================================
+const CARD_SPEC = {
+  widthMM: 85.6,
+  heightMM: 53.98,      // ISO 7810 ID-1
+  pageHeightMM: 60,      // halaman PDF (termasuk footer 6 mm)
+};
+
+// ---------------------------------------------------------------------------
+// Helper: format tanggal ke bahasa Indonesia (DD MMMM YYYY)
+// ---------------------------------------------------------------------------
 const formatDate = (dateStr) => {
   if (!dateStr) return '-';
   try {
@@ -20,11 +43,14 @@ const formatDate = (dateStr) => {
   }
 };
 
-export default function App() {
-  // Theme State
-  const [theme, setTheme] = useState('light');
-
-  // Student Form State
+// =============================================================================
+// Halaman Generator Kartu NISN
+// Mengacu pada PRD Bagian 4.1 (Modul Generator Kartu) & Bagian 4.2 (UI/UX)
+// =============================================================================
+export default function NisnGenerator() {
+  // -------------------------------------------------------------------------
+  // State Form Data Siswa — PRD Bagian 4.1: Input Nama, NISN, TTL, Gender
+  // -------------------------------------------------------------------------
   const [formData, setFormData] = useState({
     name: '',
     nisn: '',
@@ -33,42 +59,43 @@ export default function App() {
     gender: 'Laki-laki'
   });
 
-  // Validation Error State
+  // -------------------------------------------------------------------------
+  // State Validasi — PRD Bagian 4.1: NISN wajib 10 digit numerik
+  // -------------------------------------------------------------------------
   const [validationError, setValidationError] = useState('');
 
-  // UI Control State
+  // -------------------------------------------------------------------------
+  // State UI: template, flip, export, accordion
+  // -------------------------------------------------------------------------
   const [templateId, setTemplateId] = useState(1);
   const [isFlipped, setIsFlipped] = useState(false);
   const [exportMode, setExportMode] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState(null);
 
-  // Export State
+  // -------------------------------------------------------------------------
+  // State Ekspor — PRD Bagian 4.1: Mekanisme Export (Unduh) PDF/PNG
+  // -------------------------------------------------------------------------
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState(null);
-  const [lastExportType, setLastExportType] = useState(null); // 'png' or 'pdf'
+  const [lastExportType, setLastExportType] = useState(null); // 'png' | 'pdf'
 
-  // Refs for hidden captures
+  // Ref untuk hidden capture (html2canvas) — PRD Bagian 4.1: Client-Side rendering
   const captureFrontRef = useRef(null);
   const captureBackRef = useRef(null);
 
-  // Apply Theme
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
 
-  // Toggle Theme
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
-  // Form Input Changes
+
+
+  // -------------------------------------------------------------------------
+  // Handler Input Form — PRD Bagian 4.1: Validasi Input NISN (numerik, 10 digit)
+  // -------------------------------------------------------------------------
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     if (name === 'nisn') {
-      // 1. Only allow digits (0-9)
+      // Hanya izinkan digit 0-9, maksimal 10 karakter
       const cleanedValue = value.replace(/\D/g, '');
-      // 2. Max 10 digits
       const limitedValue = cleanedValue.slice(0, 10);
 
       setFormData(prev => ({
@@ -76,7 +103,7 @@ export default function App() {
         [name]: limitedValue
       }));
 
-      // Validate length dynamically
+      // Validasi panjang NISN secara dinamis
       if (limitedValue.length > 0 && limitedValue.length < 10) {
         setValidationError('NISN harus terdiri dari tepat 10 angka.');
       } else {
@@ -90,7 +117,9 @@ export default function App() {
     }
   };
 
-  // Form Submission/Export Validation
+  // -------------------------------------------------------------------------
+  // Validasi Form sebelum ekspor — PRD Bagian 4.1: Validasi Input
+  // -------------------------------------------------------------------------
   const validateForm = () => {
     if (!formData.name.trim()) {
       alert('Nama lengkap wajib diisi.');
@@ -115,7 +144,9 @@ export default function App() {
     return true;
   };
 
-  // Helper to load image for native composition
+  // -------------------------------------------------------------------------
+  // Helper: muat gambar dari aset template di folder /assets/
+  // -------------------------------------------------------------------------
   const loadImage = (src) => new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
@@ -124,7 +155,10 @@ export default function App() {
     img.src = src;
   });
 
-  // Export to PNG Image (Native Quality Composition)
+  // =========================================================================
+  // EKSPOR PNG — PRD Bagian 4.1: Mekanisme Export
+  // Komposisi native: gambar latar dari /assets/ + overlay teks dari html2canvas
+  // =========================================================================
   const handleExportPNG = async () => {
     if (!validateForm()) return;
     setIsExporting(true);
@@ -133,14 +167,15 @@ export default function App() {
 
     try {
       setExportMode(true);
-      await new Promise(resolve => setTimeout(resolve, 150)); // Wait for transparent background
+      // Tunggu render dengan background transparan (untuk overlay teks)
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const backEl = captureBackRef.current;
       if (!backEl) throw new Error("Elemen pratinjau kartu tidak ditemukan.");
 
       const canvasOpts = { scale: 4, useCORS: true, allowTaint: true, backgroundColor: null, logging: false };
       const canvasOverlay = await html2canvas(backEl, canvasOpts);
-      setExportMode(false); // Restore background
+      setExportMode(false); // Kembalikan background
 
       const triggerDownload = (dataUrl, fileName) => {
         const link = document.createElement('a');
@@ -151,8 +186,8 @@ export default function App() {
 
       const sanitizedName = formData.name.trim().replace(/\s+/g, '_');
 
-      // 1. Download Front (Native size, direct from asset)
-      const frontSrc = `/assets/template_front_${templateId}.png`;
+      // 1. Unduh Sisi Depan — gambar native langsung dari /assets/
+      const frontSrc = ASSETS.front(templateId);
       const frontImg = await loadImage(frontSrc);
       const frontCanvas = document.createElement('canvas');
       frontCanvas.width = frontImg.width;
@@ -160,15 +195,15 @@ export default function App() {
       frontCanvas.getContext('2d').drawImage(frontImg, 0, 0);
       triggerDownload(frontCanvas.toDataURL('image/png'), `Kartu_NISN_${sanitizedName}_Depan.png`);
 
-      // 2. Download Back (Compose Native background + scaled text overlay)
-      const backSrc = `/assets/template_back_${templateId}.png`;
+      // 2. Unduh Sisi Belakang — komposisi native background /assets/ + overlay teks
+      const backSrc = ASSETS.back(templateId);
       const backImg = await loadImage(backSrc);
       const compCanvas = document.createElement('canvas');
       compCanvas.width = backImg.width;
       compCanvas.height = backImg.height;
       const ctx = compCanvas.getContext('2d');
       ctx.drawImage(backImg, 0, 0);
-      // Draw text overlay stretched to fill the native background exactly
+      // Overlay teks diregangkan mengisi penuh background native
       ctx.drawImage(canvasOverlay, 0, 0, backImg.width, backImg.height);
       triggerDownload(compCanvas.toDataURL('image/png'), `Kartu_NISN_${sanitizedName}_Belakang.png`);
 
@@ -181,7 +216,11 @@ export default function App() {
     }
   };
 
-  // Export to PDF Document (Native Quality Composition)
+  // =========================================================================
+  // EKSPOR PDF — PRD Bagian 4.1: Mekanisme Export
+  // Ukuran standar ISO 7810 ID-1 (85.6 × 53.98 mm) menggunakan jsPDF
+  // Halaman depan + belakang dalam satu berkas PDF
+  // =========================================================================
   const handleExportPDF = async () => {
     if (!validateForm()) return;
     setIsExporting(true);
@@ -190,7 +229,7 @@ export default function App() {
 
     try {
       setExportMode(true);
-      await new Promise(resolve => setTimeout(resolve, 150)); // Wait for transparent background
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const backEl = captureBackRef.current;
       if (!backEl) throw new Error("Elemen pratinjau kartu tidak ditemukan.");
@@ -198,26 +237,27 @@ export default function App() {
       const canvasOpts = { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null, logging: false };
       const canvasOverlay = await html2canvas(backEl, canvasOpts);
       const overlayData = canvasOverlay.toDataURL('image/png');
-      setExportMode(false); // Restore background
+      setExportMode(false);
 
-      // Increase height slightly to 60mm to make room for the text at the bottom
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 60] });
+      // Inisialisasi PDF: landscape, ukuran halaman menampung kartu + footer
+      const { widthMM, heightMM, pageHeightMM } = CARD_SPEC;
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [widthMM, pageHeightMM] });
 
-      // Page 1: Native Front Image (JPEG for smaller file size, high quality)
-      const frontSrc = `/assets/template_front_${templateId}.png`;
+      // --- Halaman 1: Sisi Depan (gambar native dari /assets/) ---
+      const frontSrc = ASSETS.front(templateId);
       const frontImg = await loadImage(frontSrc);
       const frontCanvas = document.createElement('canvas');
       frontCanvas.width = frontImg.width;
       frontCanvas.height = frontImg.height;
       frontCanvas.getContext('2d').drawImage(frontImg, 0, 0);
-      pdf.addImage(frontCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 85.6, 53.98);
+      pdf.addImage(frontCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, widthMM, heightMM);
       pdf.setFontSize(8);
       pdf.setTextColor(100, 100, 100);
-      pdf.text('Kartu ini dibuat diwebsite: cetakkartu.com', 42.8, 58, { align: 'center' });
+      pdf.text('Kartu ini dibuat di website: cetakkartu.com', widthMM / 2, pageHeightMM - 2, { align: 'center' });
 
-      // Page 2: Native Back Image + Text Overlay
-      pdf.addPage([85.6, 53.98], 'landscape');
-      const backSrc = `/assets/template_back_${templateId}.png`;
+      // --- Halaman 2: Sisi Belakang (gambar native + overlay teks dari /assets/) ---
+      pdf.addPage([widthMM, pageHeightMM], 'landscape');
+      const backSrc = ASSETS.back(templateId);
       const backImg = await loadImage(backSrc);
       const backCanvas = document.createElement('canvas');
       backCanvas.width = backImg.width;
@@ -225,12 +265,12 @@ export default function App() {
       const backCtx = backCanvas.getContext('2d');
       backCtx.drawImage(backImg, 0, 0);
 
-      pdf.addImage(backCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 85.6, 53.98);
-      pdf.addImage(overlayData, 'PNG', 0, 0, 85.6, 53.98);
+      pdf.addImage(backCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, widthMM, heightMM);
+      pdf.addImage(overlayData, 'PNG', 0, 0, widthMM, heightMM);
 
       pdf.setFontSize(8);
       pdf.setTextColor(100, 100, 100);
-      pdf.text('Kartu ini dibuat diwebsite: cetakkartu.com', 42.8, 58, { align: 'center' });
+      pdf.text('Kartu ini dibuat di website: cetakkartu.com', widthMM / 2, pageHeightMM - 2, { align: 'center' });
 
       const sanitizedName = formData.name.trim().replace(/\s+/g, '_');
       pdf.save(`Kartu_NISN_${sanitizedName}.pdf`);
@@ -244,7 +284,9 @@ export default function App() {
     }
   };
 
-  // Retry the last failed export
+  // -------------------------------------------------------------------------
+  // Retry ekspor — PRD Bagian 4.1: Sistem Notifikasi Error (Retry Mechanism)
+  // -------------------------------------------------------------------------
   const handleRetryExport = () => {
     setExportError(null);
     if (lastExportType === 'png') {
@@ -254,24 +296,24 @@ export default function App() {
     }
   };
 
-  // Get current template back face style class
-  const getTemplateClass = (side) => {
-    if (templateId === 1) return side === 'front' ? 'card-m1-front' : 'card-m1-back';
-    if (templateId === 2) return side === 'front' ? 'card-m2-front' : 'card-m2-back';
-    if (templateId === 3) return side === 'front' ? 'card-m3-front' : 'card-m3-back';
-    return '';
-  };
-
+  // =========================================================================
+  // RENDER — PRD Bagian 4.2: Desain Visual & UI/UX Responsif
+  // =========================================================================
   return (
     <>
+      {/* Decorative background blobs */}
       <div className="bg-decorations">
         <div className="bg-blob bg-blob-1"></div>
         <div className="bg-blob bg-blob-2"></div>
       </div>
 
 
+
       <div className="home-grid">
-        {/* Left Side Panel - Input Form & Options */}
+        {/* ==================================================================
+            Panel Kiri — Form Input Data Siswa
+            PRD Bagian 4.1: Form Input & Validasi
+            ================================================================== */}
         <section className="panel">
           <h2 className="panel-title">Data Siswa</h2>
 
@@ -295,6 +337,7 @@ export default function App() {
                 id="input-nisn"
                 name="nisn"
                 type="text"
+                inputMode="numeric"
                 placeholder="Masukkan 10 digit NISN"
                 className={validationError ? 'error' : ''}
                 value={formData.nisn}
@@ -306,7 +349,7 @@ export default function App() {
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2col">
               <div className="form-group">
                 <label htmlFor="input-place">Tempat Lahir</label>
                 <input
@@ -359,39 +402,33 @@ export default function App() {
               </div>
             </div>
 
+            {/* ================================================================
+                Pemilihan Template Kartu — PRD Bagian 4.1 & 5.1
+                Template gambar diambil dari folder /assets/
+                ================================================================ */}
             <div className="form-group" style={{ marginTop: '0.5rem' }}>
               <label>Pilih Template Kartu</label>
               <div className="template-grid" role="radiogroup" aria-label="Template kartu">
-                <div
-                  className={`template-option template-option-1 ${templateId === 1 ? 'selected' : ''}`}
-                  onClick={() => setTemplateId(1)}
-                  role="radio"
-                  aria-checked={templateId === 1}
-                  tabIndex={0}
-                  title="Template Classic"
-                />
-                <div
-                  className={`template-option template-option-2 ${templateId === 2 ? 'selected' : ''}`}
-                  onClick={() => setTemplateId(2)}
-                  role="radio"
-                  aria-checked={templateId === 2}
-                  tabIndex={0}
-                  title="Template Modern 1"
-                />
-                <div
-                  className={`template-option template-option-3 ${templateId === 3 ? 'selected' : ''}`}
-                  onClick={() => setTemplateId(3)}
-                  role="radio"
-                  aria-checked={templateId === 3}
-                  tabIndex={0}
-                  title="Template Modern 3"
-                />
+                {Array.from({ length: TEMPLATE_COUNT }, (_, i) => i + 1).map(id => (
+                  <div
+                    key={id}
+                    className={`template-option template-option-${id} ${templateId === id ? 'selected' : ''}`}
+                    onClick={() => setTemplateId(id)}
+                    role="radio"
+                    aria-checked={templateId === id}
+                    tabIndex={0}
+                    title={`Template ${id}`}
+                  />
+                ))}
               </div>
             </div>
           </form>
         </section>
 
-        {/* Right Side Panel - Interactive Preview & Download actions */}
+        {/* ==================================================================
+            Panel Kanan — Preview Interaktif & Tombol Unduh
+            PRD Bagian 4.1: Live Preview & Mekanisme Export
+            ================================================================== */}
         <section className="preview-panel">
           <CardPreview
             data={formData}
@@ -415,7 +452,7 @@ export default function App() {
               className="btn btn-primary"
               onClick={handleExportPDF}
               disabled={isExporting || !!validationError || !formData.name || !formData.nisn}
-              title="Unduh sisi depan dan belakang tergabung dalam satu file PDF standar ID Card"
+              title="Unduh sisi depan dan belakang tergabung dalam satu file PDF standar ID Card (ISO 7810)"
             >
               {isExporting ? '⚙️ Memproses...' : '📄 Unduh PDF'}
             </button>
@@ -433,7 +470,9 @@ export default function App() {
         </section>
       </div>
 
-      {/* SEO Content Section */}
+      {/* ======================================================================
+          Konten SEO & FAQ — PRD Bagian 6 Rencana Pengembangan: Blog/SEO
+          ====================================================================== */}
       <section className="seo-section">
         <h2>Panduan Lengkap NISN Nasional</h2>
 
@@ -468,120 +507,42 @@ export default function App() {
           <p>Website <strong>Generator Kartu NISN</strong> ini dirancang untuk menyediakan sarana simulasi desain pembuatan Kartu NISN dengan visual yang estetik dan presisi tinggi. Seringkali, mencetak kartu secara manual membutuhkan keahlian desain grafis, sehingga layanan ini hadir untuk meniadakan hambatan teknis tersebut. Anda dapat memasukkan data secara *real-time* dan langsung mengunduh hasil dokumen siap cetaknya.</p>
         </div>
 
-        {/* FAQ - Using Accordion */}
+        {/* FAQ Accordion */}
         <h3 style={{ color: 'var(--primary-color)', textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.4rem' }}>Tanya Jawab Seputar Aplikasi (FAQ)</h3>
         <div className="seo-accordion">
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 0 ? null : 0)}
-            >
-              Apakah data yang saya masukkan aman?
-              <span>{activeAccordion === 0 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 0 && (
-              <div className="seo-accordion-content">
-                <p>Tentu saja. Tidak ada informasi apa pun yang dikirim dari perangkat Anda ke internet. Aplikasi ini beroperasi 100% menggunakan teknologi pengolahan sisi klien (Client-Side Rendering), sehingga data NISN, Nama, dan Tanggal Lahir Anda sepenuhnya tetap di dalam browser perangkat Anda saja.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 1 ? null : 1)}
-            >
-              Bagaimana cara terbaik untuk mencetak kartu fisiknya?
-              <span>{activeAccordion === 1 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 1 && (
-              <div className="seo-accordion-content">
-                <p>Kami sangat merekomendasikan penggunaan tombol <strong>Unduh PDF</strong>. Algoritma kami menggabungkan *overlay* teks di atas lapisan gambar resolusi tinggi tanpa kompresi blur berlebihan. Dokumen PDF ini dapat Anda bawa ke jasa cetak spesialis ID Card (berbahan PVC murni) atau diprint menggunakan photo paper mengilap, atau bisa dengan mudah cetak dengan menekan tombol cetak kartu diatas.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 2 ? null : 2)}
-            >
-              Apa Perbedaan NISN dan NPSN?
-              <span>{activeAccordion === 2 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 2 && (
-              <div className="seo-accordion-content">
-                <p><strong>NISN (Nomor Induk Siswa Nasional)</strong> adalah kode unik yang diberikan kepada setiap siswa sebagai identitas individu yang berlaku seumur hidup. Sedangkan <strong>NPSN (Nomor Pokok Sekolah Nasional)</strong> adalah kode unik yang diberikan kepada satuan pendidikan (sekolah) sebagai identitas resmi institusi tersebut. Keduanya merupakan bagian integral dari sistem Data Pokok Pendidikan (Dapodik).</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 3 ? null : 3)}
-            >
-              Bagaimana cara mengatasi NISN ganda?
-              <span>{activeAccordion === 3 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 3 && (
-              <div className="seo-accordion-content">
-                <p>Jika Anda memiliki lebih dari satu NISN (NISN ganda), hal ini biasanya terjadi karena sistem lama atau mutasi sekolah. Anda harus melapor ke operator sekolah Anda saat ini dengan membawa dokumen pendukung (Akte Kelahiran / Kartu Keluarga). Operator akan melakukan pengajuan "Merger NISN" atau penghapusan salah satu NISN melalui portal VervalPD (Verifikasi dan Validasi Peserta Didik) agar hanya tersisa satu NISN yang aktif dan valid.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 4 ? null : 4)}
-            >
-              Bagaimana cara memperbaiki data NISN yang salah (nama/tanggal lahir)?
-              <span>{activeAccordion === 4 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 4 && (
-              <div className="seo-accordion-content">
-                <p>Semua perubahan data identitas siswa, seperti perbaikan ejaan nama, jenis kelamin, maupun tanggal lahir yang tidak sesuai, <strong>tidak bisa diubah sendiri oleh siswa</strong>. Siswa/wali murid harus menyerahkan berkas resmi terbaru yang benar (seperti Akta Kelahiran atau Kartu Keluarga) ke bagian Tata Usaha atau Operator Sekolah tempat siswa bersekolah. Operator yang akan mengeksekusi sinkronisasi pembaruan tersebut di Dapodik.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 5 ? null : 5)}
-            >
-              Apakah NISN wajib untuk pendaftaran PPDB dan Kuliah?
-              <span>{activeAccordion === 5 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 5 && (
-              <div className="seo-accordion-content">
-                <p><strong>Sangat Wajib.</strong> NISN menjadi syarat mutlak dalam proses Penerimaan Peserta Didik Baru (PPDB) di semua jenjang (SD ke SMP, SMP ke SMA/SMK). Selain itu, untuk jalur seleksi masuk Perguruan Tinggi Negeri seperti SNBP (jalur prestasi) dan SNBT (jalur tes), siswa harus memiliki NISN yang aktif dan datanya sesuai dengan pusat data kementerian.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="seo-accordion-item">
-            <button
-              className="seo-accordion-header"
-              onClick={() => setActiveAccordion(activeAccordion === 6 ? null : 6)}
-            >
-              Berapa ukuran kartu NISN yang benar untuk dicetak?
-              <span>{activeAccordion === 6 ? '▲' : '▼'}</span>
-            </button>
-            {activeAccordion === 6 && (
-              <div className="seo-accordion-content">
-                <p>Ukuran standar untuk mencetak kartu identitas pelajar atau kartu NISN umumnya setara dengan ukuran kartu KTP, kartu kredit, atau kartu ATM, yaitu berdimensi <strong>85,6 mm × 53,98 mm</strong> (standar ISO 7810 ID-1). Jika Anda mengunduh file PDF dari generator kami, ukurannya telah disesuaikan dengan standar tersebut sehingga siap cetak (termasuk bleed area jika diperlukan).</p>
-              </div>
-            )}
-          </div>
-
+          {[
+            { q: 'Apakah data yang saya masukkan aman?', a: 'Tentu saja. Tidak ada informasi apa pun yang dikirim dari perangkat Anda ke internet. Aplikasi ini beroperasi 100% menggunakan teknologi pengolahan sisi klien (Client-Side Rendering), sehingga data NISN, Nama, dan Tanggal Lahir Anda sepenuhnya tetap di dalam browser perangkat Anda saja.' },
+            { q: 'Bagaimana cara terbaik untuk mencetak kartu fisiknya?', a: 'Kami sangat merekomendasikan penggunaan tombol <strong>Unduh PDF</strong>. Algoritma kami menggabungkan *overlay* teks di atas lapisan gambar resolusi tinggi tanpa kompresi blur berlebihan. Dokumen PDF ini dapat Anda bawa ke jasa cetak spesialis ID Card (berbahan PVC murni) atau diprint menggunakan photo paper mengilap, atau bisa dengan mudah cetak dengan menekan tombol cetak kartu diatas.' },
+            { q: 'Apa Perbedaan NISN dan NPSN?', a: '<strong>NISN (Nomor Induk Siswa Nasional)</strong> adalah kode unik yang diberikan kepada setiap siswa sebagai identitas individu yang berlaku seumur hidup. Sedangkan <strong>NPSN (Nomor Pokok Sekolah Nasional)</strong> adalah kode unik yang diberikan kepada satuan pendidikan (sekolah) sebagai identitas resmi institusi tersebut. Keduanya merupakan bagian integral dari sistem Data Pokok Pendidikan (Dapodik).' },
+            { q: 'Bagaimana cara mengatasi NISN ganda?', a: 'Jika Anda memiliki lebih dari satu NISN (NISN ganda), hal ini biasanya terjadi karena sistem lama atau mutasi sekolah. Anda harus melapor ke operator sekolah Anda saat ini dengan membawa dokumen pendukung (Akte Kelahiran / Kartu Keluarga). Operator akan melakukan pengajuan "Merger NISN" atau penghapusan salah satu NISN melalui portal VervalPD (Verifikasi dan Validasi Peserta Didik) agar hanya tersisa satu NISN yang aktif dan valid.' },
+            { q: 'Bagaimana cara memperbaiki data NISN yang salah (nama/tanggal lahir)?', a: 'Semua perubahan data identitas siswa, seperti perbaikan ejaan nama, jenis kelamin, maupun tanggal lahir yang tidak sesuai, <strong>tidak bisa diubah sendiri oleh siswa</strong>. Siswa/wali murid harus menyerahkan berkas resmi terbaru yang benar (seperti Akta Kelahiran atau Kartu Keluarga) ke bagian Tata Usaha atau Operator Sekolah tempat siswa bersekolah. Operator yang akan mengeksekusi sinkronisasi pembaruan tersebut di Dapodik.' },
+            { q: 'Apakah NISN wajib untuk pendaftaran PPDB dan Kuliah?', a: '<strong>Sangat Wajib.</strong> NISN menjadi syarat mutlak dalam proses Penerimaan Peserta Didik Baru (PPDB) di semua jenjang (SD ke SMP, SMP ke SMA/SMK). Selain itu, untuk jalur seleksi masuk Perguruan Tinggi Negeri seperti SNBP (jalur prestasi) dan SNBT (jalur tes), siswa harus memiliki NISN yang aktif dan datanya sesuai dengan pusat data kementerian.' },
+            { q: 'Berapa ukuran kartu NISN yang benar untuk dicetak?', a: 'Ukuran standar untuk mencetak kartu identitas pelajar atau kartu NISN umumnya setara dengan ukuran kartu KTP, kartu kredit, atau kartu ATM, yaitu berdimensi <strong>85,6 mm × 53,98 mm</strong> (standar ISO 7810 ID-1). Jika Anda mengunduh file PDF dari generator kami, ukurannya telah disesuaikan dengan standar tersebut sehingga siap cetak (termasuk bleed area jika diperlukan).' },
+          ].map((item, idx) => (
+            <div className="seo-accordion-item" key={idx}>
+              <button
+                className="seo-accordion-header"
+                onClick={() => setActiveAccordion(activeAccordion === idx ? null : idx)}
+              >
+                {item.q}
+                <span>{activeAccordion === idx ? '▲' : '▼'}</span>
+              </button>
+              {activeAccordion === idx && (
+                <div className="seo-accordion-content">
+                  <p dangerouslySetInnerHTML={{ __html: item.a }} />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* --- Hidden DOM elements for html2canvas clean captures (No perspective distortion) --- */}
+      {/* ======================================================================
+          Hidden DOM — PRD Bagian 4.1: html2canvas capture (Client-Side)
+          Elemen tersembunyi untuk rendering html2canvas tanpa distorsi perspektif
+          ====================================================================== */}
       <div className="hidden-capture-container" aria-hidden="true">
-        {/* FRONT CAPTURE TARGET */}
+        {/* Target Capture Sisi Depan — template dari /assets/ */}
         <div
           ref={captureFrontRef}
           id="capture-front"
@@ -591,7 +552,7 @@ export default function App() {
           <CardFront templateId={templateId} />
         </div>
 
-        {/* BACK CAPTURE TARGET */}
+        {/* Target Capture Sisi Belakang — template dari /assets/ + overlay data */}
         <div
           ref={captureBackRef}
           id="capture-back"
@@ -602,7 +563,9 @@ export default function App() {
         </div>
       </div>
 
-      {/* Error Popup Notification */}
+      {/* ======================================================================
+          Notifikasi Error — PRD Bagian 4.1: Sistem Notifikasi Error (Retry)
+          ====================================================================== */}
       <ErrorNotification
         message={exportError}
         onClose={() => setExportError(null)}

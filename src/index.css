@@ -14,6 +14,12 @@
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
 
+  /* Aliases for backward compat */
+  --text-color: var(--text-primary);
+  --bg-color: var(--bg-primary);
+  --primary-color: var(--accent);
+  --secondary-color: #10b981;
+
   /* Fonts */
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
@@ -33,6 +39,12 @@
   --glass-bg: rgba(17, 24, 39, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* Aliases */
+  --text-color: var(--text-primary);
+  --bg-color: var(--bg-primary);
+  --primary-color: var(--accent);
+  --secondary-color: #34d399;
 }
 
 /* --- Base Styles --- */
@@ -45,8 +57,8 @@
 
 body {
   font-family: var(--font-sans);
-  color: var(--text-color);
-  background-color: var(--bg-color);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -205,6 +217,7 @@ header nav a:hover::after {
   transform: scale(1.05);
 }
 
+
 .home-grid {
   flex: 1;
   display: grid;
@@ -310,7 +323,7 @@ header nav a:hover::after {
   accent-color: var(--accent);
 }
 
-/* Template Selector CSS */
+/* Template Selector — PRD Bagian 5.1: Thumbnail dari /assets/ (miniatur template_front_*.png) */
 .template-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -445,7 +458,12 @@ header nav a:hover::after {
   pointer-events: none;
 }
 
-/* Model 1: Classic Blue */
+/* ==========================================================================
+   Template Kartu — PRD Bagian 5.1: Aset Gambar & Template Kartu
+   Gambar latar belakang dimuat dari folder /assets/ (public/assets/)
+   ========================================================================== */
+
+/* Model 1: Classic Blue — PRD Bagian 5.1 (Dapodik Standard) */
 .card-m1-front {
   background: url('/assets/template_front_1.png') no-repeat center center;
   background-size: cover;
@@ -456,7 +474,7 @@ header nav a:hover::after {
   background-size: cover;
 }
 
-/* Model 2: Modern Mint Green */
+/* Model 2: Modern Mint Green — PRD Bagian 5.1 (Minimalist & Fresh) */
 .card-m2-front {
   background: url('/assets/template_front_2.png') no-repeat center center;
   background-size: cover;
@@ -470,7 +488,7 @@ header nav a:hover::after {
   color: #000000;
 }
 
-/* Model 3: Premium Slate/Gold */
+/* Model 3: Premium Slate/Gold — PRD Bagian 5.1 (Elegant & Professional) */
 .card-m3-front {
   background: url('/assets/template_front_3.png') no-repeat center center;
   background-size: cover;
@@ -1113,63 +1131,70 @@ footer {
   font-weight: 500;
 }
 
-/* Hero Visual Mockup */
-.hero-visual {
-  position: relative;
+/* Hero Visual V2 — Stacked Card with Float Animation */
+.hero-visual-v2 {
   width: 100%;
-  max-width: 800px;
-  height: 400px;
+  max-width: 500px;
+  margin: 2rem auto 0;
   display: flex;
   justify-content: center;
-  perspective: 1000px;
-  margin-top: 2rem;
 }
 
-.floating-card {
-  position: absolute;
+.hero-card-stack {
+  position: relative;
   width: 320px;
   height: 200px;
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+.hero-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 16px;
-  background: var(--glass-bg);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hero-card-shadow {
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(16,185,129,0.15));
+  transform: rotate(6deg) translateY(8px);
+  box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .hero-card-shadow {
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(16,185,129,0.08));
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+.hero-card-main {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   padding: 1.5rem;
-  transition: transform 0.5s ease;
-}
-
-.card-front {
-  transform: rotateY(-15deg) rotateX(10deg) translateZ(50px) translateX(-100px);
   z-index: 2;
-  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
 }
 
-[data-theme="dark"] .card-front {
-  background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.8));
+[data-theme="dark"] .hero-card-main {
+  background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.9));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-.card-back {
-  transform: rotateY(-15deg) rotateX(10deg) translateZ(-50px) translateX(100px) translateY(50px);
-  z-index: 1;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(248,250,252,0.9));
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
+.hero-card-stack:hover .hero-card-shadow {
+  transform: rotate(8deg) translateY(12px);
 }
 
-[data-theme="dark"] .card-back {
-  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(2,6,23,0.8));
+.hero-card-stack:hover .hero-card-main {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.2);
 }
 
-.hero-visual:hover .card-front {
-  transform: rotateY(-5deg) rotateX(5deg) translateZ(80px) translateX(-120px);
-}
-
-.hero-visual:hover .card-back {
-  transform: rotateY(-5deg) rotateX(5deg) translateZ(-20px) translateX(120px) translateY(40px);
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
 
 /* Mock Elements */
@@ -1638,9 +1663,8 @@ footer {
   .step-line { width: 2px; height: 40px; margin: 10px 0; }
   .services-grid { grid-template-columns: 1fr; }
   .footer-container { grid-template-columns: 1fr; gap: 2rem; }
-  .hero-visual { height: 300px; }
-  .card-front, .card-back { transform: none !important; position: static; margin-bottom: 1rem; }
-  .hero-visual { flex-direction: column; }
+  .hero-card-stack { width: 260px; height: 165px; }
+  .hero-card-main { padding: 1rem; }
   
   .hamburger-btn { display: block; }
   
@@ -1681,3 +1705,232 @@ footer {
   }
 }
 
+/* --- Responsive Form Grid Class --- */
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1rem;
+}
+
+/* --- Responsive Page Title Class --- */
+.responsive-page-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+}
+
+/* =============================================
+   MOBILE RESPONSIVE FIXES (max-width: 768px)
+   ============================================= */
+@media (max-width: 768px) {
+  /* --- Generator Page: Action Buttons Stack --- */
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .action-buttons .btn,
+  .action-buttons a.btn-orange {
+    width: 100%;
+    flex: none;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* --- Generator Page: Form Grid → 1 column --- */
+  .form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Generator Page: Panel padding --- */
+  .panel {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  .home-grid {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  /* --- Card Preview: Scale text for smaller screens --- */
+  .card-detail-label {
+    font-size: 0.65rem;
+    padding-right: 4px;
+  }
+  .card-detail-sep {
+    font-size: 0.65rem;
+  }
+  .card-detail-value {
+    font-size: 0.7rem;
+  }
+  .card-detail-value.nisn-value {
+    font-size: 0.85rem;
+  }
+  .card-details-table {
+    row-gap: 4%;
+  }
+
+  /* --- Pages: Glass card padding reduced --- */
+  .glass-card {
+    padding: 1.5rem !important;
+  }
+  .page-container {
+    padding: 1.5rem 1rem !important;
+    margin: 2rem auto;
+  }
+
+  /* --- Pages: About/Contact/Disclaimer header --- */
+  .about-header h1,
+  .contact-header h1,
+  .disclaimer-header h1 {
+    font-size: clamp(1.75rem, 6vw, 3rem) !important;
+  }
+  .about-header p,
+  .contact-header p,
+  .disclaimer-header p {
+    font-size: 0.95rem !important;
+  }
+
+  /* --- Contact page: Card grid & inner padding --- */
+  .contact-inner-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .contact-glass-card {
+    padding: 2rem 1.5rem !important;
+  }
+
+  /* --- SEO Section: Reduced padding --- */
+  .seo-section {
+    padding: 1.25rem;
+    margin: 2rem 1rem;
+    border-radius: 16px;
+  }
+  .seo-section h2 {
+    font-size: 1.3rem;
+  }
+  .seo-accordion-header {
+    font-size: 0.95rem;
+    padding: 0.85rem 1rem;
+  }
+  .seo-accordion-content {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  .seo-article h3 {
+    font-size: 1.15rem;
+  }
+  .seo-article p {
+    font-size: 0.95rem;
+  }
+
+  /* --- Hero Visual V2: Slightly smaller on tablets --- */
+  .hero-card-stack {
+    width: 280px;
+    height: 175px;
+  }
+  .mock-photo {
+    width: 40px;
+    height: 55px;
+  }
+
+  /* --- Template Grid: Ensure tap targets are usable --- */
+  .template-grid {
+    gap: 0.5rem;
+  }
+  .template-option {
+    min-height: 50px;
+    border-radius: 8px;
+    padding: 0.35rem;
+  }
+
+  /* --- Footer: Adjust breakpoint for 3-column → 1 column --- */
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* --- Section headers: Smaller on mobile --- */
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+  .section-header p {
+    font-size: 1rem;
+  }
+
+  /* --- CTA section: Smaller text --- */
+  .cta-content h2 {
+    font-size: 1.75rem;
+  }
+
+  /* --- Theme toggle bar: Center on mobile --- */
+  .theme-toggle-bar {
+    justify-content: center;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* =============================================
+   EXTRA SMALL SCREENS (max-width: 400px)
+   ============================================= */
+@media (max-width: 400px) {
+  /* --- Card text even smaller --- */
+  .card-detail-label {
+    font-size: 0.55rem;
+  }
+  .card-detail-sep {
+    font-size: 0.55rem;
+  }
+  .card-detail-value {
+    font-size: 0.6rem;
+  }
+  .card-detail-value.nisn-value {
+    font-size: 0.75rem;
+  }
+  .card-details-table {
+    left: 34%;
+    top: 42%;
+    width: 60%;
+    row-gap: 3%;
+  }
+
+  /* --- Hero: Smaller card stack --- */
+  .hero-card-stack {
+    width: 220px;
+    height: 140px;
+  }
+  .hero-card-main {
+    padding: 0.75rem;
+  }
+
+  /* --- Header: Smaller logo --- */
+  .logo-text h1 {
+    font-size: 1.1rem;
+  }
+  .logo-text p {
+    font-size: 0.65rem;
+  }
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  /* --- Buttons: Even more compact --- */
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.75rem;
+  }
+  .btn-large {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  /* --- Panel title --- */
+  .panel-title {
+    font-size: 1.1rem;
+  }
+
+  /* --- Stats: Smaller --- */
+  .stat-num {
+    font-size: 1.5rem;
+  }
+}
