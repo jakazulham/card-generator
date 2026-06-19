@@ -1,0 +1,14 @@
+# CetakKartu.com - Robots.txt
+User-agent: *
+Allow: /
+Allow: /nisn
+Allow: /about
+Allow: /contact
+Allow: /disclaimer
+Allow: /blog/
+
+# Disallow internal/dev paths
+Disallow: /assets/
+
+# Sitemap
+Sitemap: https://cetakkartu.com/sitemap.xml
