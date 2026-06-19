@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import CardPreview, { CardFront, CardBack } from '../components/CardPreview';
@@ -83,9 +83,22 @@ export default function NisnGenerator() {
   const captureFrontRef = useRef(null);
   const captureBackRef = useRef(null);
 
-
-
-
+  // -------------------------------------------------------------------------
+  // SEO: Set page title & meta description for /nisn
+  // -------------------------------------------------------------------------
+  useEffect(() => {
+    document.title = 'Generate NISN Online - Aplikasi Cetak Kartu Instan';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Buat dan cetak kartu NISN secara online, gratis, dan instan. Masukkan data siswa, pilih template premium, dan unduh kartu NISN dalam format PNG atau PDF siap cetak. Aman 100% tanpa upload data ke server.');
+    }
+    return () => {
+      document.title = 'CetakKartu.com - Cetak Kartu Identitas Online';
+      if (metaDesc) {
+        metaDesc.setAttribute('content', 'Platform modern untuk membuat dan mencetak berbagai kartu identitas digital secara cepat, gratis, dan profesional.');
+      }
+    };
+  }, []);
 
   // -------------------------------------------------------------------------
   // Handler Input Form — PRD Bagian 4.1: Validasi Input NISN (numerik, 10 digit)
