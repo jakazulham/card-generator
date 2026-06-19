@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function About() {
   return (
@@ -158,6 +159,12 @@ export default function About() {
           </div>
 
         </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '3rem', padding: '2.5rem', background: 'var(--bg-secondary)', borderRadius: '24px', border: '1px solid var(--border-color)', maxWidth: '900px', width: '100%' }}>
+        <h3 style={{ color: 'var(--text-primary)', fontSize: '1.4rem', marginBottom: '0.75rem' }}>Siap Membuat Kartu NISN?</h3>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '1rem' }}>Buat kartu NISN Anda sekarang — gratis, cepat, dan tanpa perlu keahlian desain.</p>
+        <Link to="/nisn" style={{ display: 'inline-block', background: 'var(--accent)', color: 'white', padding: '0.85rem 2rem', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '1rem', transition: 'transform 0.2s' }}>Buat Kartu NISN Sekarang →</Link>
       </div>
     </div>
   );

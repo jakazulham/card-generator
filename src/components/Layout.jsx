@@ -47,7 +47,7 @@ export default function Layout() {
             </div>
 
             <Link to="/about" className={currentPath === '/about' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Tentang Kami</Link>
-            <a href="https://blog.cetakkartu.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
+            <a href="/blog/" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
             <Link to="/contact" className={currentPath === '/contact' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Kontak</Link>
             <Link to="/disclaimer" className={currentPath === '/disclaimer' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
             
