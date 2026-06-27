@@ -6,10 +6,10 @@ export default function Home() {
   const [activeFaq, setActiveFaq] = useState(null);
 
   useEffect(() => {
-    document.title = 'CetakKartu.com — Cetak Kartu Identitas Online Gratis';
+    document.title = 'Aplikasi Pembuat Kartu Instan, Template NISN, BPJS, KIP, NRG dan Kartu Lainnya';
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
-      metaDesc.setAttribute('content', 'Platform modern untuk membuat dan mencetak berbagai kartu identitas digital — NISN, BPJS, Kartu Pelajar — secara cepat, gratis, dan profesional tanpa perlu keahlian desain.');
+      metaDesc.setAttribute('content', 'Buat kartu NISN, BPJS, KIP, NRG, Kartu Pelajar dan semua kartu instan dengan QR Code dinamis dan pilihan template premium secara mudah dan praktis. Coba pakai template kami, gratis.');
     }
   }, []);
 
