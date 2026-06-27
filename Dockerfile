@@ -10,14 +10,6 @@ RUN npm ci
 # Copy the rest of the application source code
 COPY . .
 
-# Accept build arguments for environment variables
-ARG VITE_API_URL
-ARG VITE_APP_ENV
-
-# Set them as environment variables so Vite can embed them during the build
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_APP_ENV=$VITE_APP_ENV
-
 # Build the application for production
 RUN npm run build
 

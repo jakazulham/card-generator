@@ -18,8 +18,8 @@ export default function Home() {
 
   const cards = [
     { name: 'Kartu NISN', status: 'available', color: 'blue', desc: 'Sistem Informasi Siswa Nasional', route: '/nisn' },
+    { name: 'Kartu BPJS', status: 'available', color: 'green', desc: 'Cetak fisik kartu jaminan kesehatan', route: '/bpjs' },
     { name: 'Kartu Pelajar', status: 'coming_soon', color: 'emerald', desc: 'Template identitas sekolah modern' },
-    { name: 'Kartu BPJS', status: 'coming_soon', color: 'green', desc: 'Cetak fisik kartu jaminan kesehatan' },
     { name: 'Kartu NUPTK', status: 'coming_soon', color: 'purple', desc: 'Nomor Pendidik & Tenaga Kependidikan' },
     { name: 'Kartu KIP/PIP', status: 'coming_soon', color: 'orange', desc: 'Kartu Indonesia Pintar' },
     { name: 'Kartu NRG', status: 'coming_soon', color: 'rose', desc: 'Nomor Registrasi Guru' },
@@ -43,7 +43,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="hero-badge">✨ V2.0 Telah Hadir - Generator Kartu NISN!</div>
+          <div className="hero-badge">✨ V2.0 Telah Hadir - Generator Kartu NISN & BPJS!</div>
           <h1 className="hero-title">
             Cetak Kartu Digital Anda Secara <span className="highlight-blue">Instan</span> & <span className="highlight-green">Profesional</span>
           </h1>
@@ -51,7 +51,7 @@ export default function Home() {
             Platform modern untuk membuat dan mencetak ID Card, Kartu NISN, dan berbagai kartu penting lainnya dengan mudah, langsung dari browser Anda tanpa keahlian desain.
           </p>
           <div className="hero-actions">
-            <button className="btn btn-primary btn-large" onClick={() => navigate('/nisn')}>
+            <button className="btn btn-primary btn-large" onClick={() => navigate('/buat-kartu')}>
               Buat Kartu Sekarang ➔
             </button>
             <a href="#services" className="btn btn-secondary btn-large">
@@ -196,7 +196,7 @@ export default function Home() {
         <div className="cta-content">
           <h2>Siap Membuat Kartu Anda?</h2>
           <p>Bergabunglah dengan ribuan pengguna lain yang sudah mencetak dokumen penting mereka dengan mudah.</p>
-          <button className="btn btn-primary btn-large" onClick={() => navigate('/nisn')}>
+          <button className="btn btn-primary btn-large" onClick={() => navigate('/buat-kartu')}>
             Mulai Sekarang - Gratis
           </button>
         </div>

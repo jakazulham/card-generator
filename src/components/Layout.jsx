@@ -6,6 +6,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const currentPath = location.pathname;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
@@ -19,46 +20,70 @@ export default function Layout() {
       <header className="saas-header">
         <div className="header-container">
           <Link to="/" className="logo-container" style={{ textDecoration: 'none' }}>
-            <div className="logo-icon">🪪</div>
             <div className="logo-text">
-              <h1>CetakKartu</h1>
-              <p>Cetak Kartu Online</p>
+              <h1>Cetak<span className="logo-dot">Kartu</span></h1>
+              <p>Buat Kartu Instan, Cetak Dimana Aja</p>
             </div>
           </Link>
           
           <div className="header-actions">
-            <button 
-              className="hamburger-btn" 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            <button
+              className={`hamburger-btn ${isMobileMenuOpen ? 'open' : ''}`}
+              onClick={() => {
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+                setMobileDropdownOpen(false);
+              }}
               aria-label="Toggle menu"
             >
-              ☰
+              <span></span>
+              <span></span>
+              <span></span>
             </button>
           </div>
 
-          <nav className={`main-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-            <Link to="/" className={currentPath === '/' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Beranda</Link>
-            
-            <div className="nav-dropdown">
-              <span className="dropdown-trigger">Buat Kartu ▾</span>
-              <div className="dropdown-menu">
-                <Link to="/nisn" className={currentPath === '/nisn' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Buat kartu NISN</Link>
-              </div>
+          {/* Mobile Menu Overlay */}
+          <div className={`mobile-overlay ${isMobileMenuOpen ? 'open' : ''}`} onClick={() => setIsMobileMenuOpen(false)} />
+
+          <nav className="main-nav desktop-only">
+            <Link to="/" className={currentPath === '/' ? 'active' : ''}>Beranda</Link>
+            <Link to="/contact" className={currentPath === '/contact' ? 'active' : ''}>Kontak</Link>
+            <Link to="/blog" className={currentPath.startsWith('/blog') ? 'active' : ''}>Blog</Link>
+            <Link to="/buat-kartu" className="nav-cta-btn">Buat Kartu</Link>
+          </nav>
+
+          <nav className={`main-nav mobile-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+            <div className="mobile-nav-header">
+              <Link to="/" className="logo-container" style={{ textDecoration: 'none' }} onClick={() => setIsMobileMenuOpen(false)}>
+                <div className="logo-text">
+                  <h1>Cetak<span className="logo-dot">Kartu</span></h1>
+                  <p>Buat Kartu Instan, Cetak Dimana Aja</p>
+                </div>
+              </Link>
+              <button
+                className="mobile-close-btn"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
             </div>
 
-            <Link to="/about" className={currentPath === '/about' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Tentang Kami</Link>
-            <a href="/blog/" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
-            <Link to="/contact" className={currentPath === '/contact' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Kontak</Link>
-            <Link to="/disclaimer" className={currentPath === '/disclaimer' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
-            
-            <button
-              className="theme-toggle-btn"
-              onClick={toggleTheme}
-              aria-label="Toggle dark mode"
-              title={theme === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'}
-            >
-              {theme === 'light' ? '🌜' : '🌞'}
-            </button>
+            <div className="mobile-nav-links">
+              <Link to="/" className={currentPath === '/' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Beranda</Link>
+              <Link to="/contact" className={currentPath === '/contact' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Kontak</Link>
+              <Link to="/blog" className={currentPath.startsWith('/blog') ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
+              <Link to="/buat-kartu" className={`mobile-nav-cta ${currentPath.startsWith('/nisn') || currentPath.startsWith('/bpjs') || currentPath === '/buat-kartu' ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>Buat Kartu</Link>
+            </div>
+
+            <div className="mobile-nav-footer">
+              <button
+                className="theme-toggle-btn"
+                onClick={toggleTheme}
+                aria-label="Toggle dark mode"
+              >
+                {theme === 'light' ? '🌜 Dark Mode' : '🌞 Light Mode'}
+              </button>
+            </div>
           </nav>
         </div>
       </header>
@@ -70,9 +95,8 @@ export default function Layout() {
       <footer className="saas-footer">
         <div className="footer-container">
           <div className="footer-brand">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-              <span style={{ fontSize: '1.5rem' }}>🪪</span>
-              <h2 style={{ fontSize: '1.2rem', margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CetakKartu.com</h2>
+            <div style={{ marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.3rem', margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, color: '#fff' }}>Cetak<span style={{ color: '#60a5fa' }}>Kartu</span><span style={{ fontWeight: 400, fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>.com</span></h2>
             </div>
             <p className="footer-desc">
               Platform modern untuk membuat dan mencetak berbagai kartu identitas digital secara cepat, gratis, dan profesional tanpa perlu keahlian desain.
@@ -81,10 +105,10 @@ export default function Layout() {
           
           <div className="footer-col">
             <h3>Produk Kami</h3>
+            <Link to="/buat-kartu">Semua Kartu</Link>
             <Link to="/nisn">Kartu NISN</Link>
+            <Link to="/bpjs">Kartu BPJS</Link>
             <span className="coming-soon-link">Kartu Pelajar (Segera)</span>
-            <span className="coming-soon-link">Kartu BPJS (Segera)</span>
-            <span className="coming-soon-link">Kartu NUPTK (Segera)</span>
           </div>
           <div className="footer-col">
             <h3>Perusahaan</h3>

@@ -8,7 +8,9 @@ Allow: /disclaimer
 Allow: /blog/
 
 # Disallow internal/dev paths
+Disallow: /jaka/
 Disallow: /assets/
+Disallow: /api/
 
 # Sitemap
 Sitemap: https://cetakkartu.com/sitemap.xml
