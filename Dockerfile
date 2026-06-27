@@ -1,29 +1,38 @@
-# Stage 1: Build the React/Vite application
-FROM node:20-alpine AS build
-
+# Stage 1: Build React/Vite frontend
+FROM node:20-alpine AS build-frontend
 WORKDIR /app
-
-# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm ci
-
-# Copy the rest of the application source code
 COPY . .
-
-# Build the application for production
 RUN npm run build
 
-# Stage 2: Serve the application with Nginx
-FROM nginx:1.25-alpine AS production
+# Stage 2: Setup backend
+FROM node:20-alpine AS build-backend
+WORKDIR /app
+COPY server/package*.json ./
+RUN npm ci --omit=dev
 
-# Copy the build output from the build stage to Nginx public directory
-COPY --from=build /app/dist /usr/share/nginx/html
+# Stage 3: Production — Nginx + Backend in one container
+FROM node:20-alpine
 
-# Copy the custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Install nginx and supervisor
+RUN apk add --no-cache nginx supervisor
 
-# Expose port 80 to the outside world
+# Copy backend
+WORKDIR /app
+COPY --from=build-backend /app/node_modules ./node_modules
+COPY server/ .
+
+# Copy frontend build to nginx
+COPY --from=build-frontend /app/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/http.d/default.conf
+
+# Copy supervisor config
+RUN mkdir -p /var/log/supervisor /run/nginx /app/data /app/uploads
+COPY supervisord.conf /etc/supervisord.conf
+
 EXPOSE 80
 
-# Start Nginx and keep it running in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
