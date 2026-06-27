@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Contact() {
+  useEffect(() => {
+    document.title = 'Hubungi Kami — CetakKartu.com';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Hubungi tim CetakKartu.com untuk pertanyaan, saran, atau bantuan seputar pembuatan kartu identitas digital. Kami siap membantu Anda.');
+    }
+  }, []);
+
   return (
     <div className="page-container" style={{ padding: '4rem 2rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       

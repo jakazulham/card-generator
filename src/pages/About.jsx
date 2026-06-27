@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function About() {
+  useEffect(() => {
+    document.title = 'Tentang Kami — CetakKartu.com';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Misi kami adalah memberikan kemudahan bagi ekosistem pendidikan di Indonesia dengan menyediakan alat bantu digital gratis, cepat, dan aman untuk membuat kartu identitas.');
+    }
+  }, []);
+
   return (
     <div className="page-container" style={{ padding: '2rem 2rem 4rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       

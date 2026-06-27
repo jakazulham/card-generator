@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Disclaimer() {
+  useEffect(() => {
+    document.title = 'Disclaimer & Ketentuan — CetakKartu.com';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Baca disclaimer dan ketentuan layanan CetakKartu.com sebelum menggunakan layanan generator kartu identitas online kami.');
+    }
+  }, []);
+
   return (
     <div className="page-container" style={{ padding: '2rem 2rem', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       

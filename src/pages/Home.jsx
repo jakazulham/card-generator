@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
   const [activeFaq, setActiveFaq] = useState(null);
+
+  useEffect(() => {
+    document.title = 'CetakKartu.com — Cetak Kartu Identitas Online Gratis';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Platform modern untuk membuat dan mencetak berbagai kartu identitas digital — NISN, BPJS, Kartu Pelajar — secara cepat, gratis, dan profesional tanpa perlu keahlian desain.');
+    }
+  }, []);
 
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);

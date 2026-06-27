@@ -75,7 +75,7 @@ export default function BlogList() {
                 className={`blog-cat-tab ${!categorySlug ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  setSearchParams({});
+                  window.location.href = '/blog';
                 }}
               >
                 Semua
@@ -87,9 +87,6 @@ export default function BlogList() {
                   className={`blog-cat-tab ${categorySlug === cat.slug ? 'active' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    setSearchParams({});
-                    window.history.pushState({}, '', `/blog/kategori/${cat.slug}`);
-                    // Force page reload for category change
                     window.location.href = `/blog/kategori/${cat.slug}`;
                   }}
                 >

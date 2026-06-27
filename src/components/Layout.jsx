@@ -95,11 +95,13 @@ export default function Layout() {
       <footer className="saas-footer">
         <div className="footer-container">
           <div className="footer-brand">
-            <div style={{ marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.3rem', margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, color: '#fff' }}>Cetak<span style={{ color: '#60a5fa' }}>Kartu</span><span style={{ fontWeight: 400, fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>.com</span></h2>
+            <div className="footer-logo">
+              <span className="footer-logo-cetak">Cetak</span>
+              <span className="footer-logo-kartu">Kartu</span>
+              <span className="footer-logo-com">.com</span>
             </div>
             <p className="footer-desc">
-              Platform modern untuk membuat dan mencetak berbagai kartu identitas digital secara cepat, gratis, dan profesional tanpa perlu keahlian desain.
+              Platform modern untuk membuat dan mencetak berbagai kartu identitas secara cepat, gratis, dan profesional tanpa perlu keahlian desain.
             </p>
           </div>
           
