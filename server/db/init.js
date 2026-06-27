@@ -19,16 +19,21 @@ export function initDatabase() {
   const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf-8');
   db.exec(schema);
 
-  // Seed default admin user if none exist
-  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
-  if (userCount.count === 0) {
-    const hash = bcrypt.hashSync(config.adminPassword, 10);
+  // Sync admin user with environment variables
+  const adminUser = db.prepare('SELECT * FROM users WHERE username = ?').get(config.adminUsername);
+  const hash = bcrypt.hashSync(config.adminPassword, 10);
+
+  if (!adminUser) {
+    // Create admin user if not exists
     db.prepare('INSERT INTO users (username, password_hash, display_name) VALUES (?, ?, ?)').run(
       config.adminUsername,
       hash,
       'Administrator'
     );
-    console.log(`Default admin user created: ${config.adminUsername}`);
+    console.log(`Admin user created: ${config.adminUsername}`);
+  } else {
+    // Update password to match current env var (keeps it in sync on redeploy)
+    db.prepare('UPDATE users SET password_hash = ? WHERE username = ?').run(hash, config.adminUsername);
   }
 
   // Seed sample category if none exist
