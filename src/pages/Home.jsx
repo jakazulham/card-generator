@@ -25,12 +25,12 @@ export default function Home() {
   ];
 
   const cards = [
-    { name: 'Kartu NISN', status: 'available', color: 'blue', desc: 'Sistem Informasi Siswa Nasional', route: '/nisn' },
-    { name: 'Kartu BPJS', status: 'available', color: 'green', desc: 'Cetak fisik kartu jaminan kesehatan', route: '/bpjs' },
-    { name: 'Kartu Pelajar', status: 'coming_soon', color: 'emerald', desc: 'Template identitas sekolah modern' },
-    { name: 'Kartu NUPTK', status: 'coming_soon', color: 'purple', desc: 'Nomor Pendidik & Tenaga Kependidikan' },
-    { name: 'Kartu KIP/PIP', status: 'coming_soon', color: 'orange', desc: 'Kartu Indonesia Pintar' },
-    { name: 'Kartu NRG', status: 'coming_soon', color: 'rose', desc: 'Nomor Registrasi Guru' },
+    { name: 'Kartu NISN', status: 'available', icon: '🎓', desc: 'Kartu Nomor Induk Siswa Nasional dengan QR Code dan 3 template premium.', route: '/nisn', preview: '/assets/template_front_1.png' },
+    { name: 'Kartu BPJS', status: 'available', icon: '🏥', desc: 'Kartu BPJS Kesehatan — salinan digital dengan 6 field data lengkap.', route: '/bpjs', preview: '/assets/bpjs_front.png' },
+    { name: 'Kartu Pelajar', status: 'coming_soon', icon: '📚', desc: 'Template identitas sekolah modern untuk pelajar.', preview: null },
+    { name: 'Kartu NUPTK', status: 'coming_soon', icon: '👨‍🏫', desc: 'Nomor Unik Pendidik & Tenaga Kependidikan.', preview: null },
+    { name: 'Kartu KIP/PIP', status: 'coming_soon', icon: '💰', desc: 'Kartu Indonesia Pintar — bantuan pendidikan.', preview: null },
+    { name: 'Kartu NRG', status: 'coming_soon', icon: '📋', desc: 'Nomor Registrasi Guru bersertifikasi.', preview: null },
   ];
 
   const faqs = [
@@ -51,7 +51,6 @@ export default function Home() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="hero-badge">✨ V2.0 Telah Hadir - Generator Kartu NISN & BPJS!</div>
           <h1 className="hero-title">
             Cetak Kartu Digital Anda Secara <span className="highlight-blue">Instan</span> & <span className="highlight-green">Profesional</span>
           </h1>
@@ -109,26 +108,42 @@ export default function Home() {
       {/* Services Section */}
       <section id="services" className="services-section">
         <div className="section-header">
-          <h2>Layanan Kami</h2>
-          <p>Pilih jenis kartu yang ingin Anda buat hari ini.</p>
+          <h2>Template Kartu</h2>
+          <p>Pilih template kartu yang ingin Anda buat. Gratis, cepat, dan data aman di browser Anda.</p>
         </div>
-        <div className="services-grid">
+        <div className="home-templates-grid">
           {cards.map((card, idx) => (
-            <div 
-              key={idx} 
-              className={`service-card ${card.status}`}
+            <div
+              key={idx}
+              className={`home-template-card ${card.status}`}
               onClick={() => card.route ? navigate(card.route) : null}
             >
-              <div className={`service-icon icon-${card.color}`}>
-                {card.status === 'available' ? '✓' : '⌛'}
+              <div className="home-template-preview">
+                {card.preview ? (
+                  <img src={card.preview} alt={card.name} className="home-template-img" />
+                ) : (
+                  <div className="home-template-placeholder">
+                    <span>{card.icon}</span>
+                  </div>
+                )}
+                {card.status === 'coming_soon' && (
+                  <div className="home-template-overlay">
+                    <span>Segera Hadir</span>
+                  </div>
+                )}
               </div>
-              <div className="service-info">
+              <div className="home-template-info">
+                <span className="home-template-icon">{card.icon}</span>
                 <h3>{card.name}</h3>
                 <p>{card.desc}</p>
               </div>
-              {card.status === 'coming_soon' && <span className="badge-soon">Segera</span>}
             </div>
           ))}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <button className="btn btn-primary btn-large" onClick={() => navigate('/buat-kartu')}>
+            Lihat Semua Template →
+          </button>
         </div>
       </section>
 
